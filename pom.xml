@@ -26,8 +26,9 @@
     <relativePath />
   </parent>
 
-  <artifactId>mybatis</artifactId>
-  <version>3.5.11-SNAPSHOT</version>
+  <groupId>com.gift</groupId>
+  <artifactId>mybatis-gift</artifactId>
+  <version>3.5.11</version>
   <packaging>jar</packaging>
 
   <name>mybatis</name>

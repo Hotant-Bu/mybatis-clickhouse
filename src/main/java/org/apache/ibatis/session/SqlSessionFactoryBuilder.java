@@ -46,6 +46,7 @@ public class SqlSessionFactoryBuilder {
 
   public SqlSessionFactory build(Reader reader, String environment, Properties properties) {
     try {
+      System.out.println("------构建sqlSession工厂------");
       XMLConfigBuilder parser = new XMLConfigBuilder(reader, environment, properties);
       return build(parser.parse());
     } catch (Exception e) {
@@ -53,9 +54,9 @@ public class SqlSessionFactoryBuilder {
     } finally {
       ErrorContext.instance().reset();
       try {
-      	if (reader != null) {
-      	  reader.close();
-      	}
+        if (reader != null) {
+          reader.close();
+        }
       } catch (IOException e) {
         // Intentionally ignore. Prefer previous error.
       }
@@ -83,9 +84,9 @@ public class SqlSessionFactoryBuilder {
     } finally {
       ErrorContext.instance().reset();
       try {
-      	if (inputStream != null) {
-      	  inputStream.close();
-      	}
+        if (inputStream != null) {
+          inputStream.close();
+        }
       } catch (IOException e) {
         // Intentionally ignore. Prefer previous error.
       }

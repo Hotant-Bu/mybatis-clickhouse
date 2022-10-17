@@ -1,5 +1,5 @@
 /*
- *    Copyright 2009-2021 the original author or authors.
+ *    Copyright 2009-2022 the original author or authors.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -16,8 +16,24 @@
 package org.apache.ibatis.mapping;
 
 /**
+ * sql语句的种类
+ *
  * @author Clinton Begin
  */
 public enum SqlCommandType {
-  UNKNOWN, INSERT, UPDATE, DELETE, SELECT, FLUSH
+  /**
+   * 未知
+   */
+  UNKNOWN,
+  /**
+   * 增
+   */
+  INSERT,
+  UPDATE,
+  DELETE,
+  SELECT,
+  /**
+   * 清理缓存
+   */
+  FLUSH
 }

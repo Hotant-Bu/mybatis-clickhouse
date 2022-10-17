@@ -1,5 +1,5 @@
 /*
- *    Copyright 2009-2021 the original author or authors.
+ *    Copyright 2009-2022 the original author or authors.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -38,19 +38,32 @@ public class DynamicContext {
     OgnlRuntime.setPropertyAccessor(ContextMap.class, new ContextAccessor());
   }
 
+  /**
+   * 上下文环境
+   */
   private final ContextMap bindings;
+  /**
+   * 用以封装sql语句片段
+   */
   private final StringJoiner sqlBuilder = new StringJoiner(" ");
+  /**
+   * 解析时唯一编号，以防止解析混乱
+   */
   private int uniqueNumber = 0;
 
   public DynamicContext(Configuration configuration, Object parameterObject) {
     if (parameterObject != null && !(parameterObject instanceof Map)) {
       MetaObject metaObject = configuration.newMetaObject(parameterObject);
       boolean existsTypeHandler = configuration.getTypeHandlerRegistry().hasTypeHandler(parameterObject.getClass());
+      // 放入上下文信息
       bindings = new ContextMap(metaObject, existsTypeHandler);
     } else {
+      // 上下文信息为空
       bindings = new ContextMap(null, false);
     }
+    // 把参数放入上下文信息
     bindings.put(PARAMETER_OBJECT_KEY, parameterObject);
+    // 把数据库id放入上下文信息
     bindings.put(DATABASE_ID_KEY, configuration.getDatabaseId());
   }
 
@@ -117,7 +130,7 @@ public class DynamicContext {
 
       Object parameterObject = map.get(PARAMETER_OBJECT_KEY);
       if (parameterObject instanceof Map) {
-        return ((Map)parameterObject).get(name);
+        return ((Map) parameterObject).get(name);
       }
 
       return null;

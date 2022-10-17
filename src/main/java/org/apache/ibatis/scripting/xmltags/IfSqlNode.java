@@ -1,5 +1,5 @@
 /*
- *    Copyright 2009-2021 the original author or authors.
+ *    Copyright 2009-2022 the original author or authors.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -19,8 +19,17 @@ package org.apache.ibatis.scripting.xmltags;
  * @author Clinton Begin
  */
 public class IfSqlNode implements SqlNode {
+  /**
+   * 表达式求值器
+   */
   private final ExpressionEvaluator evaluator;
+  /**
+   * if标签判断时的test条件
+   */
   private final String test;
+  /**
+   * 如果if成立，要被拼接的SQL片段信息
+   */
   private final SqlNode contents;
 
   public IfSqlNode(SqlNode contents, String test) {
@@ -32,6 +41,7 @@ public class IfSqlNode implements SqlNode {
   @Override
   public boolean apply(DynamicContext context) {
     if (evaluator.evaluateBoolean(test, context.getBindings())) {
+      // 将contents拼接到context
       contents.apply(context);
       return true;
     }

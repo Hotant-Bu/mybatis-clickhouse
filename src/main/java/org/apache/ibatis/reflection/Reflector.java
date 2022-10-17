@@ -53,21 +53,32 @@ import org.apache.ibatis.util.MapUtil;
  */
 public class Reflector {
 
+  // MethodHandle 方法句柄
   private static final MethodHandle isRecordMethodHandle = getIsRecordMethodHandle();
+  // 要被反射解析的类
   private final Class<?> type;
+  // 能够读的属性列表，即有get方法的属性列表
   private final String[] readablePropertyNames;
+  // 可写属性列表
   private final String[] writablePropertyNames;
+  // set方法映射表，键为属性名，值为对应的set方法
   private final Map<String, Invoker> setMethods = new HashMap<>();
+  // get方法映射表，键为属性名，值为对应的get方法
   private final Map<String, Invoker> getMethods = new HashMap<>();
+  // set方法输入类型，键为属性名，值为对应该属性的set方法的类型（实际上为set方法的第一个参数的类型）
   private final Map<String, Class<?>> setTypes = new HashMap<>();
+  // get方法输入类型，键为属性名，值为对应该属性的get方法的类型（实际上为set方法的第一个参数的类型）
   private final Map<String, Class<?>> getTypes = new HashMap<>();
+  // 默认构造函数
   private Constructor<?> defaultConstructor;
 
+  // 大小写无关的属性映射表，键为属性名全大写值，值为属性名
   private Map<String, String> caseInsensitivePropertyMap = new HashMap<>();
 
   public Reflector(Class<?> clazz) {
     type = clazz;
     addDefaultConstructor(clazz);
+    // 获取类方法
     Method[] classMethods = getClassMethods(clazz);
     if (isRecord(type)) {
       addRecordGetMethods(classMethods);
@@ -92,7 +103,9 @@ public class Reflector {
   }
 
   private void addDefaultConstructor(Class<?> clazz) {
+    // 获取类的构造函数
     Constructor<?>[] constructors = clazz.getDeclaredConstructors();
+    // 过滤出无参构造函数，即为默认构造函数
     Arrays.stream(constructors).filter(constructor -> constructor.getParameterTypes().length == 0)
       .findAny().ifPresent(constructor -> this.defaultConstructor = constructor);
   }
@@ -138,10 +151,10 @@ public class Reflector {
 
   private void addGetMethod(String name, Method method, boolean isAmbiguous) {
     MethodInvoker invoker = isAmbiguous
-        ? new AmbiguousMethodInvoker(method, MessageFormat.format(
-            "Illegal overloaded getter method with ambiguous type for property ''{0}'' in class ''{1}''. This breaks the JavaBeans specification and can cause unpredictable results.",
-            name, method.getDeclaringClass().getName()))
-        : new MethodInvoker(method);
+      ? new AmbiguousMethodInvoker(method, MessageFormat.format(
+      "Illegal overloaded getter method with ambiguous type for property ''{0}'' in class ''{1}''. This breaks the JavaBeans specification and can cause unpredictable results.",
+      name, method.getDeclaringClass().getName()))
+      : new MethodInvoker(method);
     getMethods.put(name, invoker);
     Type returnType = TypeParameterResolver.resolveReturnType(method, type);
     getTypes.put(name, typeToClass(returnType));
@@ -198,9 +211,9 @@ public class Reflector {
       return setter1;
     }
     MethodInvoker invoker = new AmbiguousMethodInvoker(setter1,
-        MessageFormat.format(
-            "Ambiguous setters defined for property ''{0}'' in class ''{1}'' with types ''{2}'' and ''{3}''.",
-            property, setter2.getDeclaringClass().getName(), paramType1.getName(), paramType2.getName()));
+      MessageFormat.format(
+        "Ambiguous setters defined for property ''{0}'' in class ''{1}'' with types ''{2}'' and ''{3}''.",
+        property, setter2.getDeclaringClass().getName(), paramType1.getName(), paramType2.getName()));
     setMethods.put(property, invoker);
     Type[] paramTypes = TypeParameterResolver.resolveParamTypes(setter1, type);
     setTypes.put(property, typeToClass(paramTypes[0]));
@@ -464,7 +477,7 @@ public class Reflector {
    */
   private static boolean isRecord(Class<?> clazz) {
     try {
-      return isRecordMethodHandle != null && (boolean)isRecordMethodHandle.invokeExact(clazz);
+      return isRecordMethodHandle != null && (boolean) isRecordMethodHandle.invokeExact(clazz);
     } catch (Throwable e) {
       throw new ReflectionException("Failed to invoke 'Class.isRecord()'.", e);
     }

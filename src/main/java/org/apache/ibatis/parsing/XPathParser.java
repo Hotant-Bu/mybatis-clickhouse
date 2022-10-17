@@ -1,5 +1,5 @@
 /*
- *    Copyright 2009-2021 the original author or authors.
+ *    Copyright 2009-2022 the original author or authors.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -46,9 +46,12 @@ import org.xml.sax.SAXParseException;
  */
 public class XPathParser {
 
+  // 代表要解析的整个xml文档
   private final Document document;
+  // 是否开启验证
   private boolean validation;
   private EntityResolver entityResolver;
+  // mybatis配置文件中的properties节点的信息
   private Properties variables;
   private XPath xpath;
 

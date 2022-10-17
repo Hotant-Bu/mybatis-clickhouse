@@ -1,5 +1,5 @@
 /*
- *    Copyright 2009-2021 the original author or authors.
+ *    Copyright 2009-2022 the original author or authors.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -35,19 +35,57 @@ import org.apache.ibatis.session.Configuration;
  * @author Clinton Begin
  */
 public class ResultMap {
+  /**
+   * 全局配置信息
+   */
   private Configuration configuration;
-
+  /**
+   * resultMap的编号
+   */
   private String id;
+  /**
+   * 最终输出结果对应的java类
+   */
   private Class<?> type;
+  /**
+   * XML中<result>的列表，即ResultMapping列表
+   */
   private List<ResultMapping> resultMappings;
+  /**
+   * XML中<id>和<idArg>的列表
+   */
   private List<ResultMapping> idResultMappings;
+  /**
+   * XML中的<constructor>的各个属性列表
+   */
   private List<ResultMapping> constructorResultMappings;
+  /**
+   * XML中非<constructor>相关的属性列表
+   */
   private List<ResultMapping> propertyResultMappings;
+  /**
+   * 所有参与映射的数据库字段的集合
+   */
   private Set<String> mappedColumns;
+  /**
+   * 所有参与映射的Java对象属性集合
+   */
   private Set<String> mappedProperties;
+  /**
+   * 鉴别器
+   */
   private Discriminator discriminator;
+  /**
+   * 是否存在嵌套映射
+   */
   private boolean hasNestedResultMaps;
+  /**
+   * 是否存在嵌套查询
+   */
   private boolean hasNestedQueries;
+  /**
+   * 是否启动自动映射
+   */
   private Boolean autoMapping;
 
   private ResultMap() {
@@ -88,7 +126,9 @@ public class ResultMap {
       resultMap.idResultMappings = new ArrayList<>();
       resultMap.constructorResultMappings = new ArrayList<>();
       resultMap.propertyResultMappings = new ArrayList<>();
+
       final List<String> constructorArgNames = new ArrayList<>();
+
       for (ResultMapping resultMapping : resultMap.resultMappings) {
         resultMap.hasNestedQueries = resultMap.hasNestedQueries || resultMapping.getNestedQueryId() != null;
         resultMap.hasNestedResultMaps = resultMap.hasNestedResultMaps || (resultMapping.getNestedResultMapId() != null && resultMapping.getResultSet() == null);
@@ -126,9 +166,9 @@ public class ResultMap {
         final List<String> actualArgNames = argNamesOfMatchingConstructor(constructorArgNames);
         if (actualArgNames == null) {
           throw new BuilderException("Error in result map '" + resultMap.id
-              + "'. Failed to find a constructor in '"
-              + resultMap.getType().getName() + "' by arg names " + constructorArgNames
-              + ". There might be more info in debug log.");
+            + "'. Failed to find a constructor in '"
+            + resultMap.getType().getName() + "' by arg names " + constructorArgNames
+            + ". There might be more info in debug log.");
         }
         resultMap.constructorResultMappings.sort((o1, o2) -> {
           int paramIdx1 = actualArgNames.indexOf(o1.getProperty());
@@ -152,7 +192,7 @@ public class ResultMap {
         if (constructorArgNames.size() == paramTypes.length) {
           List<String> paramNames = getArgNames(constructor);
           if (constructorArgNames.containsAll(paramNames)
-              && argTypesMatch(constructorArgNames, paramTypes, paramNames)) {
+            && argTypesMatch(constructorArgNames, paramTypes, paramNames)) {
             return paramNames;
           }
         }
@@ -161,17 +201,17 @@ public class ResultMap {
     }
 
     private boolean argTypesMatch(final List<String> constructorArgNames,
-        Class<?>[] paramTypes, List<String> paramNames) {
+                                  Class<?>[] paramTypes, List<String> paramNames) {
       for (int i = 0; i < constructorArgNames.size(); i++) {
         Class<?> actualType = paramTypes[paramNames.indexOf(constructorArgNames.get(i))];
         Class<?> specifiedType = resultMap.constructorResultMappings.get(i).getJavaType();
         if (!actualType.equals(specifiedType)) {
           if (log.isDebugEnabled()) {
             log.debug("While building result map '" + resultMap.id
-                + "', found a constructor with arg names " + constructorArgNames
-                + ", but the type of '" + constructorArgNames.get(i)
-                + "' did not match. Specified: [" + specifiedType.getName() + "] Declared: ["
-                + actualType.getName() + "]");
+              + "', found a constructor with arg names " + constructorArgNames
+              + ", but the type of '" + constructorArgNames.get(i)
+              + "' did not match. Specified: [" + specifiedType.getName() + "] Declared: ["
+              + actualType.getName() + "]");
           }
           return false;
         }

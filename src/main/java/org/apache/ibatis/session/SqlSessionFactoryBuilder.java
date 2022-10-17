@@ -24,6 +24,8 @@ import org.apache.ibatis.builder.xml.XMLConfigBuilder;
 import org.apache.ibatis.exceptions.ExceptionFactory;
 import org.apache.ibatis.executor.ErrorContext;
 import org.apache.ibatis.session.defaults.DefaultSqlSessionFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Builds {@link SqlSession} instances.
@@ -31,6 +33,8 @@ import org.apache.ibatis.session.defaults.DefaultSqlSessionFactory;
  * @author Clinton Begin
  */
 public class SqlSessionFactoryBuilder {
+
+  // public static final Logger logger = LoggerFactory.getLogger(SqlSessionFactoryBuilder.class);
 
   public SqlSessionFactory build(Reader reader) {
     return build(reader, null, null);
@@ -77,6 +81,7 @@ public class SqlSessionFactoryBuilder {
 
   public SqlSessionFactory build(InputStream inputStream, String environment, Properties properties) {
     try {
+      System.out.println("------解析配置文件，构建sqlSession工厂------");
       XMLConfigBuilder parser = new XMLConfigBuilder(inputStream, environment, properties);
       return build(parser.parse());
     } catch (Exception e) {

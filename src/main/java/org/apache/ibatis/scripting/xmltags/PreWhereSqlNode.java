@@ -15,15 +15,22 @@
  */
 package org.apache.ibatis.scripting.xmltags;
 
+import org.apache.ibatis.session.Configuration;
+
+import java.util.Arrays;
+import java.util.List;
+
 /**
- * @author Clinton Begin
+ * 适配clickhouse的prewhere关键字
+ *
+ * @author Gift
  */
-public interface SqlNode {
-  /**
-   * 完成节点自身的解析
-   *
-   * @param context
-   * @return
-   */
-  boolean apply(DynamicContext context);
+public class PreWhereSqlNode extends TrimSqlNode {
+
+  private static List<String> prefixList = Arrays.asList("AND ", "OR ", "AND\n", "OR\n", "AND\r", "OR\r", "AND\t", "OR\t");
+
+  public PreWhereSqlNode(Configuration configuration, SqlNode contents) {
+    super(configuration, contents, "PREWHERE", prefixList, null, null);
+  }
+
 }

@@ -67,6 +67,7 @@ public class XMLScriptBuilder extends BaseBuilder {
   private void initNodeHandlerMap() {
     nodeHandlerMap.put("trim", new TrimHandler());
     nodeHandlerMap.put("where", new WhereHandler());
+    nodeHandlerMap.put("prewhere", new PreWhereHandler());
     nodeHandlerMap.put("set", new SetHandler());
     nodeHandlerMap.put("foreach", new ForEachHandler());
     nodeHandlerMap.put("if", new IfHandler());
@@ -185,6 +186,23 @@ public class XMLScriptBuilder extends BaseBuilder {
       targetContents.add(where);
     }
   }
+
+  /**
+   * 新增适配clickhouse的标签处理器，prewhere
+   */
+  private class PreWhereHandler implements NodeHandler {
+    public PreWhereHandler() {
+      // Prevent Synthetic Access
+    }
+
+    @Override
+    public void handleNode(XNode nodeToHandle, List<SqlNode> targetContents) {
+      MixedSqlNode mixedSqlNode = parseDynamicTags(nodeToHandle);
+      PreWhereSqlNode preWhere = new PreWhereSqlNode(configuration, mixedSqlNode);
+      targetContents.add(preWhere);
+    }
+  }
+
 
   private class SetHandler implements NodeHandler {
     public SetHandler() {

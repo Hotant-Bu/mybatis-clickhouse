@@ -48,14 +48,27 @@ import org.apache.ibatis.transaction.TransactionFactory;
 import org.apache.ibatis.type.JdbcType;
 
 /**
+ * 主要负责解析mybatis-config.xml配置文件
+ *
  * @author Clinton Begin
  * @author Kazuki Shimizu
  */
 public class XMLConfigBuilder extends BaseBuilder {
-
+  /**
+   * 标识是否已经解析国配置文件
+   */
   private boolean parsed;
+  /**
+   * 用以解析mybatis-config.xml配置文件的XPathParser对象
+   */
   private final XPathParser parser;
+  /**
+   * 标识<environment>配置的名称
+   */
   private String environment;
+  /**
+   * 负责创建和缓存Reflector对象
+   */
   private final ReflectorFactory localReflectorFactory = new DefaultReflectorFactory();
 
   public XMLConfigBuilder(Reader reader) {
@@ -92,11 +105,12 @@ public class XMLConfigBuilder extends BaseBuilder {
   }
 
   public Configuration parse() {
+    // 判断是否已经完成了对mybatis-config.xml配置文件的解析
     if (parsed) {
       throw new BuilderException("Each XMLConfigBuilder can only be used once.");
     }
     parsed = true;
-    // 从根节点开展解析下层节点
+    // 从根节点开展解析下层节点。在mybatis-config.xml配置文件中查找<configuration>节点，并开始解析
     parseConfiguration(parser.evalNode("/configuration"));
     return configuration;
   }
@@ -106,20 +120,31 @@ public class XMLConfigBuilder extends BaseBuilder {
       // issue #117 read properties first
       // 首先解析properties，以保证在解析其他节点时便可以生效
       propertiesElement(root.evalNode("properties"));
+      // 解析<settings>节点
       Properties settings = settingsAsProperties(root.evalNode("settings"));
+      // 设置vfsImpl字段
       loadCustomVfs(settings);
       loadCustomLogImpl(settings);
+      // 解析<typeAliases>节点
       typeAliasesElement(root.evalNode("typeAliases"));
+      // 解析<plugins>节点
       pluginElement(root.evalNode("plugins"));
+      // 解析<objectFactory>节点
       objectFactoryElement(root.evalNode("objectFactory"));
+      // 解析<objectWrapperFactory>节点
       objectWrapperFactoryElement(root.evalNode("objectWrapperFactory"));
+      // 解析<reflectorFactory>节点
       reflectorFactoryElement(root.evalNode("reflectorFactory"));
       // <settings>
       settingsElement(settings);
       // read it after objectFactory and objectWrapperFactory issue #631
+      // 解析<environments>节点
       environmentsElement(root.evalNode("environments"));
+      // 解析<databaseIdProvider>节点
       databaseIdProviderElement(root.evalNode("databaseIdProvider"));
+      // 解析<typeHandlers>节点
       typeHandlerElement(root.evalNode("typeHandlers"));
+      // 解析<mappers>节点
       mapperElement(root.evalNode("mappers"));
     } catch (Exception e) {
       throw new BuilderException("Error parsing SQL Mapper Configuration. Cause: " + e, e);
@@ -372,6 +397,12 @@ public class XMLConfigBuilder extends BaseBuilder {
     }
   }
 
+  /**
+   * 解析<mapper>节点
+   *
+   * @param parent
+   * @throws Exception
+   */
   private void mapperElement(XNode parent) throws Exception {
     if (parent != null) {
       for (XNode child : parent.getChildren()) {
@@ -382,9 +413,11 @@ public class XMLConfigBuilder extends BaseBuilder {
           // 全部加入Mappers中
           configuration.addMappers(mapperPackage);
         } else {
+          // 三种配置<mappers>方案，还有个是扫描package。如下，resource、url、class这三个属性互斥
           String resource = child.getStringAttribute("resource");
           String url = child.getStringAttribute("url");
           String mapperClass = child.getStringAttribute("class");
+
           if (resource != null && url == null && mapperClass == null) {
             ErrorContext.instance().resource(resource);
             try (InputStream inputStream = Resources.getResourceAsStream(resource)) {
@@ -399,6 +432,7 @@ public class XMLConfigBuilder extends BaseBuilder {
             }
           } else if (resource == null && url == null && mapperClass != null) {
             Class<?> mapperInterface = Resources.classForName(mapperClass);
+            // 如果<mapper>节点指定了class属性，则向MapperRegistry注册该Mapper接口
             configuration.addMapper(mapperInterface);
           } else {
             throw new BuilderException("A mapper element may only specify a url, resource or class, but not more than one.");

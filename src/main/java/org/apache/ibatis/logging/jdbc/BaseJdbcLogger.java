@@ -1,5 +1,5 @@
 /*
- *    Copyright 2009-2021 the original author or authors.
+ *    Copyright 2009-2022 the original author or authors.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -40,15 +40,36 @@ import org.apache.ibatis.reflection.ArrayUtil;
  */
 public abstract class BaseJdbcLogger {
 
+  /**
+   * 记录了PreparedStatement接口中定义的常用的set*()方法
+   */
   protected static final Set<String> SET_METHODS;
+  /**
+   * 记录了statement接口和PreparedStatement接口中与执行SQL语句相关的方法
+   */
   protected static final Set<String> EXECUTE_METHODS = new HashSet<>();
 
+  /**
+   * 记录了PreparedStatement.set*()方法设置的键值对
+   */
   private final Map<Object, Object> columnMap = new HashMap<>();
 
+  /**
+   * 记录了PreparedStatement.set*()方法设置的key值
+   */
   private final List<Object> columnNames = new ArrayList<>();
+  /**
+   * 记录了PreparedStatement.set*()方法设置的value值
+   */
   private final List<Object> columnValues = new ArrayList<>();
 
+  /**
+   * 用以日志输出的Log对象
+   */
   protected final Log statementLog;
+  /**
+   * 记录了SQL的层数，用于格式化输出sql
+   */
   protected final int queryStack;
 
   /*
@@ -65,10 +86,10 @@ public abstract class BaseJdbcLogger {
 
   static {
     SET_METHODS = Arrays.stream(PreparedStatement.class.getDeclaredMethods())
-            .filter(method -> method.getName().startsWith("set"))
-            .filter(method -> method.getParameterCount() > 1)
-            .map(Method::getName)
-            .collect(Collectors.toSet());
+      .filter(method -> method.getName().startsWith("set"))
+      .filter(method -> method.getParameterCount() > 1)
+      .map(Method::getName)
+      .collect(Collectors.toSet());
 
     EXECUTE_METHODS.add("execute");
     EXECUTE_METHODS.add("executeUpdate");

@@ -1,5 +1,5 @@
 /*
- *    Copyright 2009-2021 the original author or authors.
+ *    Copyright 2009-2022 the original author or authors.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -25,18 +25,25 @@ import java.sql.SQLException;
  */
 public interface TypeHandler<T> {
 
+  /**
+   * 在通过PreparedStatement为SQL语句绑定参数时，会将数据由Java类型转换成JdbcType类型
+   *
+   * @param ps
+   * @param i
+   * @param parameter
+   * @param jdbcType
+   * @throws SQLException
+   */
   void setParameter(PreparedStatement ps, int i, T parameter, JdbcType jdbcType) throws SQLException;
 
   /**
    * Gets the result.
+   * 从结果集中获取数据时，则需要从jdbc类型转成Java类型
    *
-   * @param rs
-   *          the rs
-   * @param columnName
-   *          Column name, when configuration <code>useColumnLabel</code> is <code>false</code>
+   * @param rs         the rs
+   * @param columnName Column name, when configuration <code>useColumnLabel</code> is <code>false</code>
    * @return the result
-   * @throws SQLException
-   *           the SQL exception
+   * @throws SQLException the SQL exception
    */
   T getResult(ResultSet rs, String columnName) throws SQLException;
 

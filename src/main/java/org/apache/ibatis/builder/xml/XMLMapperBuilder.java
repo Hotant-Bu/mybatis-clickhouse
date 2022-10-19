@@ -91,6 +91,7 @@ public class XMLMapperBuilder extends BaseBuilder {
   }
 
   public void parse() {
+    // 判断是否已经加载过该映射文件
     if (!configuration.isResourceLoaded(resource)) {
       // 处理mapper节点
       configurationElement(parser.evalNode("/mapper"));
@@ -133,6 +134,11 @@ public class XMLMapperBuilder extends BaseBuilder {
     }
   }
 
+  /**
+   * 解析select、insert、update、delete等sql节点
+   *
+   * @param list
+   */
   private void buildStatementFromContext(List<XNode> list) {
     if (configuration.getDatabaseId() != null) {
       buildStatementFromContext(list, configuration.getDatabaseId());
@@ -424,6 +430,9 @@ public class XMLMapperBuilder extends BaseBuilder {
     }
   }
 
+  /**
+   * 注册Mapper接口
+   */
   private void bindMapperForNamespace() {
     String namespace = builderAssistant.getCurrentNamespace();
     if (namespace != null) {

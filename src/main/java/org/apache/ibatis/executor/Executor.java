@@ -54,6 +54,14 @@ public interface Executor {
 
   void clearLocalCache();
 
+  /**
+   * 延迟加载一级缓存中的数据
+   * @param ms
+   * @param resultObject
+   * @param property
+   * @param key
+   * @param targetType
+   */
   void deferLoad(MappedStatement ms, MetaObject resultObject, String property, CacheKey key, Class<?> targetType);
 
   Transaction getTransaction();
